@@ -31,11 +31,8 @@
     dragonImage,
     canvas, context;
 
-
   function gameLoop() {
-
     window.requestAnimationFrame(gameLoop);
-
     dragon.update();
     dragon.render();
   }
@@ -47,10 +44,15 @@
       tickCount = 0,
       ticksPerFrame = options.ticksPerFrame || 0,
       rowsInSheet = options.rowsInSheet || 1;
-      columnsInSheet = options.columnsInSheet || 1;
-      xIndex = 0;
-      yIndex = 0;
-      direction = 1;
+    columnsInSheet = options.columnsInSheet || 1;
+    xIndex = 0;
+    yIndex = 0;
+    wingDirection = 1;
+
+    xPosition = 100;
+    yPosition = 100;
+    xDirection = -1;
+    yDirection = -1;
 
     that.context = options.context;
     that.width = options.width;
@@ -59,46 +61,69 @@
 
     that.update = function () {
       tickCount += 1;
+      xPosition += xDirection;
+      yPosition += yDirection;
       if (tickCount > ticksPerFrame) {
-        frameIndex += direction;
+        frameIndex += wingDirection;
         tickCount = 0;
         if (frameIndex < rowsInSheet * columnsInSheet && frameIndex >= 0) {
           that.xIndex = frameIndex % rowsInSheet;
           that.yIndex = Math.floor(frameIndex / columnsInSheet);
-//          console.log('frameIndex [' + frameIndex + ']');
-//          console.log('x = [' + that.xIndex + ']');
-//          console.log('y = [' + that.yIndex + ']');
         } else {
-          direction = direction * -1;
+          wingDirection = wingDirection * -1;
         }
       }
     };
 
+    that.follow = function(mouseX, mouseY) {
+      if (mouseX > xPosition) {
+         xDirection = 1;
+      } else {
+         xDirection = -1;
+      }
+      if (mouseY > yPosition) {
+         yDirection = 1;
+      } else {
+         yDirection = -1;
+      }
+      console.log('Current Position [' + xPosition + "," + yPosition + "]");
+      console.log('Mouse Position [' + mouseX + "," + mouseY + "]");
+      console.log('Following [' + xDirection + "," + yDirection + "]");
+    };
+
     that.render = function () {
-      that.context.clearRect(0, 0, that.width, that.height);
+      that.context.clearRect(0, 0, 1200, 1200);
       that.context.drawImage(
         that.image,
           that.xIndex * that.width,
           that.yIndex * that.height,
         that.width,
         that.height,
-        0,
-        0,
+        xPosition,
+        yPosition,
         that.width,
         that.height);
     };
-
     return that;
+  }
+
+  function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
   }
 
   // Get canvas
   canvas = document.getElementById("dragonAnimation");
-  canvas.width = 600;
-  canvas.height = 600;
+  canvas.width = 1200;
+  canvas.height = 1200;
   context = canvas.getContext("2d")
+
   // Create sprite sheet
   dragonImage = new Image();
-  context.translate(100, 100);
+  // context.translate(100, 100);
   // context.rotate(Math.PI / 4);
 
   // Create sprite
@@ -112,9 +137,14 @@
     ticksPerFrame: 3
   });
 
+  canvas.addEventListener('mousemove', function (evt) {
+    var mousePos = getMousePos(canvas, evt);
+    dragon.follow(mousePos.x, mousePos.y);
+  }, false);
+
   // Load sprite sheet
   dragonImage.addEventListener("load", gameLoop);
-  dragonImage.src = "images/dragons.png";
+  dragonImage.src = "images/ice_dragon.png";
 
 }());
 
