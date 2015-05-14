@@ -95,8 +95,8 @@
       that.context.clearRect(0, 0, 1200, 1200);
       that.context.drawImage(
         that.image,
-          that.xIndex * that.width,
-          that.yIndex * that.height,
+        that.xIndex * that.width,
+        that.yIndex * that.height,
         that.width,
         that.height,
         xPosition,
@@ -134,7 +134,7 @@
     image: dragonImage,
     rowsInSheet: 3,
     columnsInSheet: 3,
-    ticksPerFrame: 3
+    ticksPerFrame: 1
   });
 
   canvas.addEventListener('mousemove', function (evt) {
@@ -144,7 +144,8 @@
 
   // Load sprite sheet
   dragonImage.addEventListener("load", gameLoop);
-  dragonImage.src = "images/ice_dragon.png";
+  dragonImage.src = "images/fire" +
+    "_dragon.png";
 
 }());
 
